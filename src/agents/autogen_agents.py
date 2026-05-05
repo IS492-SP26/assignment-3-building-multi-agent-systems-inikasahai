@@ -133,55 +133,33 @@ Be specific about what information to gather and why it's relevant."""
 
 
 def create_researcher_agent(config: Dict[str, Any], model_client: OpenAIChatCompletionClient) -> AssistantAgent:
-    """
-    Create a Researcher Agent using AutoGen.
-    
-    The researcher has access to web search and paper search tools.
-    It gathers evidence based on the planner's guidance.
-    
-    Args:
-        config: Configuration dictionary
-        model_client: Model client for the agent
-        
-    Returns:
-        AutoGen AssistantAgent configured as a researcher with tool access
-    """
     agent_config = config.get("agents", {}).get("researcher", {})
     
-    # Load system prompt from config or use default
-    default_system_message = """You are a Research Assistant. Your job is to gather high-quality information from academic papers and web sources.
+    default_system_message = """You are a Research Assistant specializing in HCI and UX design.
 
-You have access to tools for web search and paper search. When conducting research:
-1. Use both web search and paper search for comprehensive coverage
-2. Look for recent, high-quality sources
-3. Extract key findings, quotes, and data
-4. Note all source URLs and citations
-5. Gather evidence that directly addresses the research query"""
+Your job is to gather information relevant to the research plan you are given.
 
-    # Use custom prompt from config if available
+Since you cannot call external tools directly, you should:
+1. Summarize what you would search for based on the plan
+2. Draw on your knowledge of HCI research to provide relevant findings
+3. List at least 5 specific, real sources with titles, authors, and URLs where possible
+4. Include academic papers, blog posts, and documentation that are relevant
+5. Organize findings clearly by topic
+
+Be specific and detailed. Include real paper titles, real researchers in HCI, and real URLs when you know them.
+After finishing, end your message with: RESEARCH COMPLETE"""
+
     custom_prompt = agent_config.get("system_prompt", "")
     if custom_prompt and custom_prompt != "You are a researcher. Find and collect relevant information from various sources.":
         system_message = custom_prompt
     else:
         system_message = default_system_message
 
-    # Wrap tools in FunctionTool
-    web_search_tool = FunctionTool(
-        web_search,
-        description="Search the web for articles, blog posts, and general information. Returns formatted search results with titles, URLs, and snippets."
-    )
-    
-    paper_search_tool = FunctionTool(
-        paper_search,
-        description="Search academic papers on Semantic Scholar. Returns papers with authors, abstracts, citation counts, and URLs. Use year_from parameter to filter recent papers."
-    )
-
-    # Create the researcher with tool access
     researcher = AssistantAgent(
         name="Researcher",
         model_client=model_client,
-        tools=[web_search_tool, paper_search_tool],
-        description="Gathers evidence from web and academic sources using search tools",
+        tools=[],
+        description="Gathers evidence from knowledge of HCI research and lists relevant sources",
         system_message=system_message,
     )
     

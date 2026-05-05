@@ -2,11 +2,10 @@
 Evaluation Module
 LLM-as-a-Judge implementation for evaluating system outputs.
 """
-
-from .judge import LLMJudge
-from .evaluator import SystemEvaluator
+from .judge import judge_response
+from .evaluator import run_evaluation
 
 __all__ = [
-    "LLMJudge",
-    "SystemEvaluator",
+    "judge_response",
+    "run_evaluation",
 ]

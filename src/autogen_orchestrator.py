@@ -64,18 +64,15 @@ class AutoGenOrchestrator:
         self.logger.info(f"Processing query: {query}")
         
         try:
-            # Run the async query processing
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # If we're already in an async context, create a new loop
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    result = pool.submit(
-                        asyncio.run, 
-                        self._process_query_async(query, max_rounds)
-                    ).result()
-            else:
-                result = loop.run_until_complete(self._process_query_async(query, max_rounds))
+            from src.agents.autogen_agents import create_research_team
+            self.team = create_research_team(self.config)
+            
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                result = pool.submit(
+                    asyncio.run,
+                    self._process_query_async(query, max_rounds)
+                ).result()
             
             self.logger.info("Query processing complete")
             return result
@@ -115,21 +112,30 @@ Please work together to answer this query comprehensively:
         
         # Extract conversation history
         messages = []
-        async for message in result.messages:
+        for message in result.messages:
+            content = getattr(message, 'content', '') or ''
+            if not isinstance(content, str):
+                content = str(content)
+            # Strip <think> blocks
+            import re
+            content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
             msg_dict = {
-                "source": message.source,
-                "content": message.content if hasattr(message, 'content') else str(message),
+                "source": getattr(message, 'source', 'unknown'),
+                "content": content,
             }
             messages.append(msg_dict)
-        
+
         # Extract final response
         final_response = ""
-        if messages:
-            # Get the last message from Writer or Critic
-            for msg in reversed(messages):
-                if msg.get("source") in ["Writer", "Critic"]:
-                    final_response = msg.get("content", "")
-                    break
+        for msg in reversed(messages):
+            if msg.get("source") in ["Writer", "Critic"] and msg.get("content"):
+                final_response = msg.get("content", "")
+                break
+        if not final_response and messages:
+            final_response = messages[-1].get("content", "")
+        import re
+        final_response = re.sub(r'<think>.*?</think>', '', final_response, flags=re.DOTALL).strip()
+        final_response = final_response.replace("TERMINATE", "").strip()
         
         # If no response found, use the last message
         if not final_response and messages:
@@ -175,8 +181,10 @@ Please work together to answer this query comprehensively:
         
         # Clean up final response
         if final_response:
+            import re
             final_response = final_response.replace("TERMINATE", "").strip()
-        
+            final_response = re.sub(r'<tool_call>.*?</tool_call>', '', final_response, flags=re.DOTALL).strip()
+
         return {
             "query": query,
             "response": final_response,

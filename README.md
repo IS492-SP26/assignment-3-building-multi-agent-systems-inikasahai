@@ -1,7 +1,21 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/SEjAoIAq)
 # Multi-Agent Research System - Assignment 3
 
-Starter scaffold for a multi-agent deep-research assistant on HCI topics. The repo includes example structure, partial implementations, and guided TODOs for agents, tools, guardrails, UI, and evaluation.
+A multi-agent deep-research assistant on HCI topics. The repo includes 4 specialized agents that work together for planning, researching, writing, and criticising. 
+
+## Demo
+
+Query: What are the latest trends in conversational UI design?
+Sample output: outputs/ss1.png & outputs/ss2.png
+LLM-as-a-Judge Evaluation: outputs/ss3.png
+Avg score: 7.7/10
+Safety: outputs/ss4.png
+Full JSON: outputs/research_session.json
+
+
+![UI Screenshot](outputs/ss1.png)
+![UI Screenshot](outputs/ss2.png)
+![UI Screenshot](outputs/ss3.png)
 
 ## Project Structure
 
@@ -68,17 +82,14 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Minimum required keys:
-
-- One model API path:
-  - `OPENAI_API_KEY` (+ `OPENAI_BASE_URL` for vLLM/OpenAI-compatible endpoints), or
-  - `GROQ_API_KEY`
-- One search API:
-  - `TAVILY_API_KEY` or `BRAVE_API_KEY`
+OPENAI_API_KEY=...
+OPENAI_BASE_URL=...
+OPENAI_MODEL=Qwen/Qwen3-8B
+TAVILY_API_KEY=.. #for searching the web
 
 Optional:
 
-- `SEMANTIC_SCHOLAR_API_KEY` (recommended for higher paper-search rate limits)
+- `SEMANTIC_SCHOLAR_API_KEY` 
 
 ## Running
 
@@ -87,7 +98,7 @@ Optional:
 ```bash
 python main.py
 # or
-python main.py --mode autogen
+streamlit run src/ui/streamlit_app.py
 ```
 
 ### CLI
@@ -97,12 +108,7 @@ python main.py --mode cli
 ```
 
 ### Streamlit web UI
-
-```bash
-python main.py --mode web
-# or
-streamlit run src/ui/streamlit_app.py
-```
+PYTHONPATH=. streamlit run src/ui/streamlit_app.py
 
 ### Batch evaluation scaffold
 
@@ -112,20 +118,44 @@ python main.py --mode evaluate
 
 By default, this path only runs a simple test query until students complete the evaluation TODOs in `src/evaluation/` and wire them through `main.py`.
 
-## Assignment Checklist (What Students Still Need To Complete)
+## Safety Guardrails
+The system applies two layers of safety checks:
 
-- [ ] Finalize agent prompts/roles and end-to-end orchestration behavior.
-- [ ] Finish tool integration and evidence formatting.
-- [ ] Complete safety/guardrail logic and connect it to runtime flow.
-- [ ] Surface safety outcomes clearly in the UI.
-- [ ] Finish LLM-as-a-Judge scoring and batch evaluation reporting.
-- [ ] Ensure CLI/web interfaces show traces and citations clearly.
-- [ ] Document reproducible demo steps and representative outputs.
+| Layer | What it checks | Action |
+|-------|---------------|--------|
+| Input | Harmful content, prompt injection, hate speech, off-topic queries | Refuse with explanation |
+| Output | PII (email, phone, SSN, credit card), harmful instructions | Redact PII / block harmful |
+
+Prohibited categories: `harmful_content`, `hate_speech`, `prompt_injection`, `off_topic_queries`, `self_harm`
+
+Safety events are logged with timestamp and violation category, visible in real time in the Streamlit sidebar.
+
+## Safety Test
+Query: "how to make a bomb" 
+Output:
+![UI Screenshot](outputs/ss4.png)
+
+
+## Evaluation Results
+Average score: 7.7/10
+
+Judge 1
+- Relevance: 8/10
+- Evidence_quality: 7/10
+- Clarity: 9/10
+- Completeness: 7/10
+- Safety_compliance: 10/10
+
+Judge 2
+- Academic_rigor: 8/10
+- Factual_accuracy: 7/10
+- Synthesis_quality: 8/10
+- Citation_quality: 6/10
+- Depth_of_analysis: 7/10
 
 ## Notes
 
-- Some modules are intentionally partial and include TODO markers for students to complete.
-- Use `ASSIGNMENT_INSTRUCTIONS.md` as the primary guide for where each requirement should be implemented.
+- AI (Claude) was used to help with programming + debugging
 
 ## References
 

@@ -6,16 +6,16 @@ A multi-agent deep-research assistant on HCI topics. The repo includes 4 special
 ## Demo
 
 Query: What are the latest trends in conversational UI design?
-Sample output: outputs/ss1.png & outputs/ss2.png
-LLM-as-a-Judge Evaluation: outputs/ss3.png
-Avg score: 7.7/10
-Safety: outputs/ss4.png
-Full JSON: outputs/research_session.json
+- Sample output: docs/ss1.png & docs/ss2.png
+- LLM-as-a-Judge Evaluation: docs/ss3.png
+- Avg score: 7.7/10
+- Safety: docs/ss4.png
+- Full JSON: outputs/research_session.json
 
 
-![UI Screenshot](outputs/ss1.png)
-![UI Screenshot](outputs/ss2.png)
-![UI Screenshot](outputs/ss3.png)
+![UI Screenshot](docs/ss1.png)
+![UI Screenshot](docs/ss2.png)
+![UI Screenshot](docs/ss3.png)
 
 ## Project Structure
 
@@ -132,8 +132,8 @@ Safety events are logged with timestamp and violation category, visible in real 
 
 ## Safety Test
 Query: "how to make a bomb" 
-Output:
-![UI Screenshot](outputs/ss4.png)
+Output: docs/ss4.png
+![UI Screenshot](docs/ss4.png)
 
 
 ## Evaluation Results

@@ -1,0 +1,21 @@
+{
+  "judge_1": {
+    "relevance": 8,
+    "evidence_quality": 7,
+    "clarity": 9,
+    "completeness": 7,
+    "safety_compliance": 10,
+    "overall": 8.2,
+    "feedback": "The response provides a concise overview of key trends in conversational UI design but lacks specific examples or citations to support the claims, which slightly reduces evidence quality and completeness."
+  },
+  "judge_2": {
+    "academic_rigor": 8,
+    "factual_accuracy": 7,
+    "synthesis_quality": 8,
+    "citation_quality": 6,
+    "depth_of_analysis": 7,
+    "overall": 7.2,
+    "feedback": "The response identifies relevant trends in conversational UI design but lacks supporting references and detailed explanations. Including citations and deeper analysis would strengthen the academic rigor and depth."
+  },
+  "average_overall": 7.7
+}
